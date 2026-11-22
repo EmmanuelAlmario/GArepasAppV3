@@ -4,16 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run scripts:build && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx --env-file=.env.local src/db/seed.ts",
+    "db:seed": "tsx --env-file=.env.local src/db/dev/seed.ts",
     "test:units": "tsx src/lib/units.test.ts && tsx src/lib/costos.test.ts && tsx src/lib/produccion-gastos.test.ts && tsx src/lib/analitica.test.ts && tsx src/lib/motor-alertas.test.ts",
     "typecheck": "tsc --noEmit",
-    "db:carta-real": "tsx --env-file=.env.local src/db/cargar-carta-real.ts",
-    "db:demo": "tsx --env-file=.env.local src/db/demo-datos.ts"
+    "db:carta-real": "tsx --env-file=.env.local src/db/dev/cargar-carta-real.ts",
+    "db:demo": "tsx --env-file=.env.local src/db/dev/demo-datos.ts",
+    "db:carta-publica": "tsx --env-file=.env.local src/db/dev/carta-publica.ts",
+    "db:migrate:prod": "node scripts/migrar.mjs",
+    "db:admin": "node scripts/admin.mjs",
+    "db:clasificar-carta": "node scripts/clasificar-carta.mjs",
+    "scripts:build": "esbuild scripts/migrar.mjs scripts/admin.mjs scripts/clasificar-carta.mjs --bundle --platform=node --format=esm --outdir=scripts/dist --out-extension:.js=.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -38,6 +43,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.11",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",

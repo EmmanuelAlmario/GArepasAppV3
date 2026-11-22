@@ -9,7 +9,7 @@
  * npx tsx --env-file=.env.local src/db/cargar-carta-real.ts
  */
 import { eq, sql } from "drizzle-orm";
-import { db } from "./index";
+import { db } from "../index";
 import {
     abonos,
     ajustesInventario,
@@ -25,8 +25,14 @@ import {
     productos,
     recetas,
     ventas,
-} from "./schema";
-import type { Unidad } from "../lib/units";
+} from "../schema";
+import type { Unidad } from "../../lib/units";
+
+if (process.env.NODE_ENV === "production") {
+    console.error("Script de desarrollo: en producción usa `node scripts/migrar.mjs` y `node scripts/admin.mjs`.");
+    process.exit(1);
+}
+
 
 type InsumoSeed = {
     nombre: string;

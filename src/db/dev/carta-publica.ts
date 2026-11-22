@@ -5,8 +5,14 @@
  * npx tsx --env-file=.env.local src/db/carta-publica.ts
  */
 import { asc, eq } from "drizzle-orm";
-import { db } from "./index";
-import { productos } from "./schema";
+import { db } from "../index";
+import { productos } from "../schema";
+
+if (process.env.NODE_ENV === "production") {
+    console.error("Script de desarrollo: en producción usa `node scripts/migrar.mjs` y `node scripts/admin.mjs`.");
+    process.exit(1);
+}
+
 
 type Item = {
     nombre: string;

@@ -10,7 +10,7 @@
  * npx tsx --env-file=.env.local src/db/demo-datos.ts
  */
 import { eq, sql } from "drizzle-orm";
-import { db } from "./index";
+import { db } from "../index";
 import {
     abonos,
     ajustesInventario,
@@ -27,8 +27,14 @@ import {
     productos,
     recetas,
     ventas,
-} from "./schema";
-import { round2, round4 } from "../lib/num";
+} from "../schema";
+import { round2, round4 } from "../../lib/num";
+
+if (process.env.NODE_ENV === "production") {
+    console.error("Script de desarrollo: en producción usa `node scripts/migrar.mjs` y `node scripts/admin.mjs`.");
+    process.exit(1);
+}
+
 
 const DIAS = 30;
 const HOY = new Date();

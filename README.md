@@ -19,6 +19,37 @@ npm run dev                       # http://localhost:3000
 Rutas públicas: `/login`, `/menu` (carta), `/api/public/menu`.
 Todo lo demás exige sesión; `/usuarios` y `/configuracion` exigen rol ADMIN.
 
+## Puesta en producción (Railway)
+
+La app se monta sobre la **misma base Postgres** que usaba el sistema anterior.
+El migrador reconoce una base creada por Flyway y solo aplica los cambios nuevos.
+
+```bash
+# 1. Variables en el servicio de Railway
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+AUTH_SECRET=$(openssl rand -base64 48)
+NEXT_PUBLIC_WHATSAPP_URL=https://wa.me/57XXXXXXXXXX   # opcional
+
+# 2. Desplegar desde la rama v3 (Dockerfile incluido)
+#    El contenedor corre las migraciones y luego arranca:
+#    node scripts/dist/migrar.mjs && node server.js
+
+# 3. Clasificar los productos existentes para la carta pública (idempotente)
+npm run db:clasificar-carta
+
+# 4. Si hiciera falta un administrador nuevo (la base antigua ya tiene usuarios)
+ADMIN_USERNAME=admin ADMIN_PASSWORD='...' npm run db:admin
+```
+
+- `railway.json` declara el healthcheck en `/api/health` (comprueba la base).
+- Los usuarios del sistema anterior sirven tal cual: la clave es bcrypt.
+- Apaga el backend Spring antes de operar con esta consola para no escribir
+  dos aplicaciones en la misma base.
+- Las migraciones quedan registradas en `_migraciones`; la `0000` se marca sola
+  cuando detecta tablas existentes.
+- Las fechas se guardan en UTC (Railway corre en UTC) y las pantallas las
+  muestran en hora de Bogotá.
+
 ## Scripts
 
 | Script | Qué hace |
@@ -27,9 +58,12 @@ Todo lo demás exige sesión; `/usuarios` y `/configuracion` exigen rol ADMIN.
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run db:generate` | genera SQL desde `src/db/schema.ts` |
 | `npm run db:migrate` | aplica migraciones |
-| `npm run db:seed` | semilla mínima (usuarios, carta de ejemplo) |
-| `npm run db:carta-real` | carga la carta real desde el CSV de recetas (borra el catálogo de prueba) |
-| `npm run db:demo` | regenera 30 días de operación con ~1.000 ventas para probar la UI |
+| `npm run db:migrate:prod` | migra la base de producción (baseline automático) |
+| `npm run db:admin` | crea o actualiza un usuario ADMIN desde variables |
+| `npm run db:clasificar-carta` | asigna sección y descripción a los productos existentes |
+| `npm run db:seed` | **solo desarrollo**: usuarios y carta de ejemplo |
+| `npm run db:carta-real` | **solo desarrollo**: carga la carta del CSV |
+| `npm run db:demo` | **solo desarrollo**: 30 días de operación con 1.000 ventas |
 | `npm run test:units` | autochequeos de unidades, costos, producción y gastos |
 
 ## Estructura

@@ -6,7 +6,7 @@
  */
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { db } from "./index";
+import { db } from "../index";
 import {
     configuracionNegocio,
     detalleRecetas,
@@ -14,8 +14,14 @@ import {
     productos,
     recetas,
     usuarios,
-} from "./schema";
-import { precioABase, type Unidad } from "../lib/units";
+} from "../schema";
+import { precioABase, type Unidad } from "../../lib/units";
+
+if (process.env.NODE_ENV === "production") {
+    console.error("Script de desarrollo: en producción usa `node scripts/migrar.mjs` y `node scripts/admin.mjs`.");
+    process.exit(1);
+}
+
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin123";
 const CAJERO_PASSWORD = process.env.CAJERO_PASSWORD ?? "cajero123";
