@@ -28,7 +28,6 @@ El migrador reconoce una base creada por Flyway y solo aplica los cambios nuevos
 # 1. Variables en el servicio de Railway
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 AUTH_SECRET=$(openssl rand -base64 48)
-NEXT_PUBLIC_WHATSAPP_URL=https://wa.me/57XXXXXXXXXX   # opcional
 
 # 2. Desplegar desde la rama v3 (Dockerfile incluido)
 #    El contenedor corre las migraciones y luego arranca:
